@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@types/request": "0.0.43",
-    "mongoose": "^4.10.0"
+    "moment": "^2.19.1"
   },
   "description": ""
 }

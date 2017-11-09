@@ -31,64 +31,34 @@
 
  */
 
+var moment = require('moment');
 const request = require("request");
-const mongoose = require("mongoose");
 const dotconf = require("./config");
 
-mongoose.Promise = global.Promise
-mongoose.connect(dotconf.dburi);
 
-var wetterSchema = mongoose.Schema({
-    time: String,
-    air : String,
-    sun : String,
-    rain : String,
-    winds : String,
-    windd : String,
-    windm : String,
-    humidity : String,
-    airp1 : String,
-    airp2 : String,
-    airp3 : String,
-    created : Date    
-});
-
-wetterSchema.methods.initWithArray = function(f){
-    this.time = f[1]
-    this.air = f[2]
-    this.sun = f[3]
-    this.rain = f[4]
-    this.windd = f[5]
-    this.winds = f[6]
-    this.windm = f[8]  
-    this.humidity = f[9]
-    this.airp1 = f[7]
-    this.airp2 = f[10]
-    this.airp3 = f[11]
-    this.created = new Date()
+class WetterDaten{
+    constructor( f ){
+        // this.time = f[1]
+        this.air = f[2]
+        this.sun = f[3]
+        this.rain = f[4]
+        this.windd = f[5]
+        this.winds = f[6]
+        this.windm = f[8]  
+        this.humidity = f[9]
+        this.airp1 = f[7]
+        this.airp2 = f[10]
+        this.airp3 = f[11]
+        this.created = moment().format()
+    }
 }
-
-var db = mongoose.connection
-var WetterDaten = db.model('lei',wetterSchema)
-
-db.once('open', () => { console.log('Connected')})
-
 
 request.get(dotconf.metnet, function (r, data) {
     const lines = data.body.split('\n');
     const st = lines.filter((l) => { return l.match(/^LEI/); });
-    var d = new WetterDaten
-    d.initWithArray(st.pop().split('|'))
-    WetterDaten.findOne({time:d.time}, 'time air')
-    .then(function(obj){
-        if( obj ){
-           db.close()
-	   return 1;
-        }
-        else{
-            d.save().then(function(){  db.close() ; return 0})   
-        }
-    })  
+    var d = new WetterDaten( st.pop().split("|") )
+    console.log( d )
+    
 });
 
 
