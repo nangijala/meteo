@@ -32,9 +32,18 @@
  */
 
 var moment = require('moment');
+const fs = require('fs')
 const request = require("request");
 const dotconf = require("./config");
+const child_process = require('child_process')
 
+var colData = []
+const fileName = '/mnt/RAMDisk/data.json'
+if( fs.existsSync(fileName)){
+    colData = require(fileName)
+}else{
+    fs.writeFileSync(fileName, JSON.stringify(colData))
+}
 
 class WetterDaten{
     constructor( f ){
@@ -53,12 +62,21 @@ class WetterDaten{
     }
 }
 
+var ldrObj=child_process.spawnSync('./ldr.py') 
+var ldr=parseInt( ldrObj.stdout.toString() )
+
 request.get(dotconf.metnet, function (r, data) {
     const lines = data.body.split('\n');
     const st = lines.filter((l) => { return l.match(/^LEI/); });
     var d = new WetterDaten( st.pop().split("|") )
-    console.log( d )
-    
+    const sensorPath= "/sys/bus/w1/devices/w1_bus_master1/28-03168acbaeff/w1_slave"
+    if( fs.existsSync( sensorPath )){
+        const innen = parseFloat( fs.readFileSync(sensorPath).toString().split('\n')[1].split('=')[1]/1000 ).toFixed(1)
+        d.innen = innen 
+    }
+    d.ldr = ldr
+    colData.push(d)    
+    fs.writeFileSync(fileName, JSON.stringify(colData))
 });
 
 

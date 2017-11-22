@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@types/request": "0.0.43",
-    "moment": "^2.19.1"
+    "moment": "^2.19.1",
+    "node-dht-sensor": "0.0.33"
   },
   "description": ""
 }
