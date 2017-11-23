@@ -36,6 +36,9 @@ const fs = require('fs')
 const request = require("request");
 const dotconf = require("./config");
 const child_process = require('child_process')
+var sensor = require('node-dht-sensor');
+
+const hasArg = process.argv.slice(2).length
 
 var colData = []
 const fileName = '/mnt/RAMDisk/data.json'
@@ -65,6 +68,7 @@ class WetterDaten{
 var ldrObj=child_process.spawnSync('./ldr.py') 
 var ldr=parseInt( ldrObj.stdout.toString() )
 
+
 request.get(dotconf.metnet, function (r, data) {
     const lines = data.body.split('\n');
     const st = lines.filter((l) => { return l.match(/^LEI/); });
@@ -75,8 +79,25 @@ request.get(dotconf.metnet, function (r, data) {
         d.innen = innen 
     }
     d.ldr = ldr
-    colData.push(d)    
-    fs.writeFileSync(fileName, JSON.stringify(colData))
+		var p = new Promise( (resolve, reject) => {
+			sensor.read(11, 27, function(err, temperature, humidity) {
+				if(err)
+					resolve(0)
+				resolve( humidity.toFixed(1) )
+			})
+		})
+		.then( (va) => {
+			d.hum = va
+			colData.push(d)    
+			if( !hasArg ){
+				fs.writeFileSync(fileName, JSON.stringify(colData))
+			}else{
+				console.log( 'Debug: ')
+				console.log( d )
+			}
+		},
+		(va) => { }
+		)
 });
 
 
