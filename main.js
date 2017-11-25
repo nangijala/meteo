@@ -89,12 +89,7 @@ request.get(dotconf.metnet, function (r, data) {
 		.then( (va) => {
 			d.hum = va
 			colData.push(d)    
-			if( !hasArg ){
-				fs.writeFileSync(fileName, JSON.stringify(colData))
-			}else{
-				console.log( 'Debug: ')
-				console.log( d )
-			}
+			fs.writeFileSync(fileName, JSON.stringify(colData))
 		},
 		(va) => { }
 		)
