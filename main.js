@@ -1,35 +1,3 @@
-/**
- * Parameter:
-----------
-                         Einheit                  Beschreibung
-2 tre200s0                 °C                       Lufttemperatur 2 m über Boden; Momentanwert
-3 sre000z0                 min                      Sonnenscheindauer; Zehnminutensumme
-4 rre150z0                 mm                       Niederschlag; Zehnminutensumme
-5 dkl010z0                 °                        Windrichtung; Zehnminutenmittel
-6 fu3010z0                 km/h                     Windgeschwindigkeit; Zehnminutenmittel
-7 pp0qnhs0                 hPa                      Luftdruck reduziert auf Meeresniveau mit Standardatmosphäre (QNH); Momentanwert
-8 fu3010z1                 km/h                     Böenspitze (Sekundenböe); Maximum
-9 ure200s0                 %                        Relative Luftfeuchtigkeit 2 m über Boden; Momentanwert
-10 prestas0                 hPa                      Luftdruck auf Stationshöhe (QFE); Momentanwert
-11 pp0qffs0                 hPa                      Luftdruck reduziert auf Meeresniveau (QFF); Momentanwert
-
- 
- 'stn|time|tre200s0|sre000z0|rre150z0|dkl010z0|fu3010z0|pp0qnhs0|fu3010z1|ure200s0|prestas0|pp0qffs0'
-
-[ 'LEI',
-  '201705191550',
-  '9.3',
-  '0',
-  '0.0',
-  '249',
-  '9.4',
-  '1019.2',
-  '16.9',
-  '89',
-  '978.5',
-  '1019.6' ]
-
- */
 
 var moment = require('moment');
 const fs = require('fs')
@@ -41,12 +9,18 @@ var sensor = require('node-dht-sensor');
 const hasArg = process.argv.slice(2).length
 
 var colData = []
-const fileName = '/mnt/RAMDisk/data.json'
+
+const ramPath = '/mnt/RAMDisk/'
+const smbPath = '/mnt/SMBDisk/meteo/'
+
+const fileName = ramPath + 'data.json'
 if( fs.existsSync(fileName)){
     colData = require(fileName)
 }else{
     fs.writeFileSync(fileName, JSON.stringify(colData))
 }
+
+const dayFile = ramPath . moment().format('YYYY-MM-DD') + '.json'
 
 class WetterDaten{
     constructor( f ){
@@ -68,6 +42,18 @@ class WetterDaten{
 var ldrObj=child_process.spawnSync('./ldr.py') 
 var ldr=parseInt( ldrObj.stdout.toString() )
 
+function saveDayFile(d){
+    const smbDayFile = smbPath + dayFile;
+    var dayData = []
+    if( fs.existsSync(smbDayFile) ){
+        dayData = require(smbDayFile)
+    }
+    var ts = moment(d.created)
+    const hour = ts.format('H')
+    const minute = ts.format('m')
+    dayData[hour][minute] = d
+    fs.writeFileSync(smbDayFile, JSON.stringify(dayData))
+}
 
 request.get(dotconf.metnet, function (r, data) {
     const lines = data.body.split('\n');
@@ -79,20 +65,21 @@ request.get(dotconf.metnet, function (r, data) {
         d.innen = innen 
     }
     d.ldr = ldr
-		var p = new Promise( (resolve, reject) => {
-			sensor.read(11, 27, function(err, temperature, humidity) {
-				if(err)
-					resolve(0)
-				resolve( humidity.toFixed(1) )
-			})
-		})
-		.then( (va) => {
-			d.hum = va
-			colData.push(d)    
-			fs.writeFileSync(fileName, JSON.stringify(colData))
-		},
-		(va) => { }
-		)
+    var p = new Promise( (resolve, reject) => {
+        sensor.read(11, 27, function(err, temperature, humidity) {
+            if(err)
+                resolve(0)
+            resolve( humidity.toFixed(1) )
+        })
+    })
+    .then( (va) => {
+        d.hum = va
+        colData.push(d)    
+        fs.writeFileSync(fileName, JSON.stringify(colData))
+        saveDayFile(d)
+    },
+    (va) => { }
+    )
 });
 
 
