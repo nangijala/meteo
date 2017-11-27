@@ -20,7 +20,7 @@ if( fs.existsSync(fileName)){
     fs.writeFileSync(fileName, JSON.stringify(colData))
 }
 
-const dayFile = ramPath . moment().format('YYYY-MM-DD') + '.json'
+const dayFile = smbPath + moment().format('YYYY-MM-DD') + '.json'
 
 class WetterDaten{
     constructor( f ){
@@ -39,20 +39,22 @@ class WetterDaten{
     }
 }
 
-var ldrObj=child_process.spawnSync('./ldr.py') 
+var ldrObj=child_process.spawnSync('./ldr.py', {timeout:10*1000}) 
 var ldr=parseInt( ldrObj.stdout.toString() )
 
 function saveDayFile(d){
-    const smbDayFile = smbPath + dayFile;
-    var dayData = []
-    if( fs.existsSync(smbDayFile) ){
-        dayData = require(smbDayFile)
+    var dayData = {}
+    if( fs.existsSync(dayFile) ){
+        dayData = require(dayFile)
     }
     var ts = moment(d.created)
     const hour = ts.format('H')
     const minute = ts.format('m')
-    dayData[hour][minute] = d
-    fs.writeFileSync(smbDayFile, JSON.stringify(dayData))
+	//console.log( hour, minute, ts)
+	if( !dayData.hasOwnProperty( hour ) )
+		dayData[hour] = []
+    	dayData[hour].push( d )
+    fs.writeFileSync(dayFile, JSON.stringify(dayData))
 }
 
 request.get(dotconf.metnet, function (r, data) {
