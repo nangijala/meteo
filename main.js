@@ -14,9 +14,15 @@ const ramPath = '/mnt/RAMDisk/'
 const smbPath = '/mnt/SMBDisk/meteo/'
 
 const fileName = ramPath + 'data.json'
+const smbFileName = smbPath + 'data.json'
+
 if( fs.existsSync(fileName)){
     colData = require(fileName)
 }else{
+    if( fs.existsSync(smbFileName)){
+        fs.copyFileSync( smbFileName, fileName)
+    }
+    colData = require(fileName)    
     fs.writeFileSync(fileName, JSON.stringify(colData))
 }
 
@@ -77,7 +83,10 @@ request.get(dotconf.metnet, function (r, data) {
     .then( (va) => {
         d.hum = va
         colData.push(d)    
+        if( colData.length > 600)
+            colData.shift(1)
         fs.writeFileSync(fileName, JSON.stringify(colData))
+        fs.writeFileSync(smbFileName, JSON.stringify(colData))        
         saveDayFile(d)
     },
     (va) => { }
