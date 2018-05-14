@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@types/request": "0.0.43",
+    "googleapis": "^27.0.0",
     "moment": "^2.19.1",
     "node-dht-sensor": "0.0.33"
   },
