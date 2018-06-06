@@ -42,7 +42,9 @@ function getData( dayFile ){
             continue
 
         var hourAir = hourData.map( (v) => { return Number( v['air']) }).filter((v) => !isNaN(v))
-        var hourAirAgv = hourAir.reduce( (sum, current) =>  {return sum+current} ) / hourAir.length
+
+	if( hourAir.length)
+	        var hourAirAgv = hourAir.reduce( (sum, current) =>  {return sum+current} ) / hourAir.length
         if( !isNaN( hourAirAgv)){
             allDayTemps.push( hourAirAgv)
             totalTempAvg = allDayTemps.reduce( (sum,current) => sum+current) / (allDayTemps.length == 0 ? 1 : allDayTemps.length)
