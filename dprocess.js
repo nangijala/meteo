@@ -50,7 +50,8 @@ function getData( dayFile ){
         maxAirHour.push( Math.max( ...hourAir) )
         minAirHour.push( Math.min( ...hourAir) )
 
-        var hourAirAgv = hourAir.reduce( (sum, current) =>  {return sum+current} ) / hourAir.length
+	      if( hourAir.length)
+	        var hourAirAgv = hourAir.reduce( (sum, current) =>  {return sum+current} ) / hourAir.length
         if( !isNaN( hourAirAgv)){
             allDayTemps.push( hourAirAgv)
             totalTempAvg = allDayTemps.reduce( (sum,current) => sum+current) / (allDayTemps.length == 0 ? 1 : allDayTemps.length)
@@ -70,7 +71,12 @@ function getData( dayFile ){
     //    console.log( `Sonne: ${hourSun} Total/h: ${hourSunSum}  ${totalSunMinutes}`)
 
     }
-    return [[Number(totalTempAvg.toFixed(1)), Number(totalRain.toFixed(1)), totalSunMinutes, Math.max(...maxAirHour), Math.min(...minAirHour)]]
+    return [ [Number(totalTempAvg.toFixed(1)), 
+              Number(totalRain.toFixed(1)), 
+              totalSunMinutes, 
+              Math.max(...maxAirHour) === -Infinity ? 0 : Math.max(...maxAirHour), 
+              Math.min(...minAirHour) === Infinity ? 0 : Math.min(...minAirHour)]
+            ]
 }
 
 
