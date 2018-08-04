@@ -21,7 +21,10 @@ const processingDay = processDate.format("DDD") - 123
 const smbPath =  os.platform() === "darwin" ? dotconf.testPath  : dotconf.livePath
 const dayFile = smbPath + processDate.format('YYYY-MM-DD') + '.json'
 
-// console.log( os.platform(), dayFile, getData(dayFile))
+if( os.platform() === "darwin" ){
+  console.log( os.platform(), dayFile, getData(dayFile))
+  process.exit(1)  
+}
 
 
 function getData( dayFile ){
@@ -35,6 +38,8 @@ function getData( dayFile ){
     var totalSunMinutes = 0
     var totalTempAvg = 0.0
     var allDayTemps = []
+    var maxAirHour = []
+    var minAirHour = []
     for( var i = 0; i<= 23; i++){
 
         var hourData = dayData[i]
@@ -42,13 +47,16 @@ function getData( dayFile ){
             continue
 
         var hourAir = hourData.map( (v) => { return Number( v['air']) }).filter((v) => !isNaN(v))
+        maxAirHour.push( Math.max( ...hourAir) )
+        minAirHour.push( Math.min( ...hourAir) )
+
         var hourAirAgv = hourAir.reduce( (sum, current) =>  {return sum+current} ) / hourAir.length
         if( !isNaN( hourAirAgv)){
             allDayTemps.push( hourAirAgv)
             totalTempAvg = allDayTemps.reduce( (sum,current) => sum+current) / (allDayTemps.length == 0 ? 1 : allDayTemps.length)
         }
 
-        // console.log( `Temperaturen: ${hourAir} Durchschnitt/h: ${hourAirAgv.toFixed(1)} Durchschnitt/tag: ${totalTempAvg.toFixed(1)}`)
+//         console.log( `Temperaturen ${i}: ${hourAir} Durchschnitt/h: ${hourAirAgv.toFixed(1)} Avg: ${totalTempAvg.toFixed(1)} Max: ${Math.max(...maxAirHour)}, Min: ${Math.min(...minAirHour)}`)
 
         var hourRain = hourData.map( (v) =>   isNaN( Number( v['rain'])) ? 0.0 :Number( v['rain'])  )
         var hourRainSum = hourRain.reduce( (rainAcc, current) => { return rainAcc + (isNaN(current) ? 0 :current) }).toFixed(1)
@@ -62,7 +70,7 @@ function getData( dayFile ){
     //    console.log( `Sonne: ${hourSun} Total/h: ${hourSunSum}  ${totalSunMinutes}`)
 
     }
-    return [[Number(totalTempAvg.toFixed(1)) , Number(totalRain.toFixed(1)), totalSunMinutes]]
+    return [[Number(totalTempAvg.toFixed(1)), Number(totalRain.toFixed(1)), totalSunMinutes, Math.max(...maxAirHour), Math.min(...minAirHour)]]
 }
 
 
