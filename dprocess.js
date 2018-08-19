@@ -71,12 +71,32 @@ function getData( dayFile ){
     //    console.log( `Sonne: ${hourSun} Total/h: ${hourSunSum}  ${totalSunMinutes}`)
 
     }
+
+    /*
+             dayData.day = {    sunrise: srise.format("HH:mm:ss"), 
+                            sunset: sset.format("HH:mm:ss"), 
+                            hours: duration.hours(), 
+                            minutes:duration.minutes() 
+                        }
+                        */
+
+    if( dayData.day){
+      var r = dayData.day.sunrise
+      var s = dayData.day.sunset
+      var h = dayData.day.hours
+      var m = dayData.day.minutes
+    }
+
     return [ [Number(totalTempAvg.toFixed(1)), 
               Number(totalRain.toFixed(1)), 
               totalSunMinutes, 
               Math.max(...maxAirHour) === -Infinity ? 0 : Math.max(...maxAirHour), 
-              Math.min(...minAirHour) === Infinity ? 0 : Math.min(...minAirHour)]
-            ]
+              Math.min(...minAirHour) === Infinity ? 0 : Math.min(...minAirHour),
+              r,
+              s,
+              h,
+              m
+            ]]
 }
 
 
