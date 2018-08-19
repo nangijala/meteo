@@ -1,2 +1,3 @@
 */12 * * * * /home/pi/.nvm/versions/node/v8.5.0/bin/node /home/pi/meteojs/main.js
 15   0 * * * /home/pi/.nvm/versions/node/v8.5.0/bin/node /home/pi/meteojs/dprocess.js
+1   10 * * * /home/pi/.nvm/versions/node/v8.5.0/bin/node /home/pi/meteojs/fetch_date_infos.js
