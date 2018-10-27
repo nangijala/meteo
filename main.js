@@ -3,8 +3,7 @@ var moment = require('moment');
 const fs = require('fs')
 const request = require("request");
 const dotconf = require("./config");
-const child_process = require('child_process')
-var sensor = require('node-dht-sensor');
+const sensor = require('node-dht-sensor');
 
 const hasArg = process.argv.slice(2).length
 
@@ -45,8 +44,6 @@ class WetterDaten{
     }
 }
 
-var ldrObj=child_process.spawnSync('./ldr.py', {timeout:10*1000}) 
-var ldr=parseInt( ldrObj.stdout.toString() )
 
 function saveDayFile(d){
     var dayData = {}
@@ -72,7 +69,7 @@ request.get(dotconf.metnet, function (r, data) {
         const innen = parseFloat( fs.readFileSync(sensorPath).toString().split('\n')[1].split('=')[1]/1000 ).toFixed(1)
         d.innen = innen 
     }
-    d.ldr = ldr
+    d.ldr = null
     var p = new Promise( (resolve, reject) => {
         sensor.read(11, 27, function(err, temperature, humidity) {
             if(err)
