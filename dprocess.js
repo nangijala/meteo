@@ -16,8 +16,7 @@ if( processDate.isValid() === false){
     process.exit(1)
 }
 
-// console.log( processDate, " ROWNR=", processDate.format("DDD") - 125 )
-const processingDay = processDate.format("DDD") - 123
+const processingDay = processDate.format("DDD") - dotconf.dayOffset
 const smbPath =  os.platform() === "darwin" ? dotconf.testPath  : dotconf.livePath
 const dayFile = smbPath + processDate.format('YYYY-MM-DD') + '.json'
 
