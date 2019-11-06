@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@types/request": "0.0.43",
-    "mongoose": "^4.10.0"
+    "mongoose": "^5.7.8"
   },
   "description": ""
 }
