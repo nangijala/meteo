@@ -85,6 +85,9 @@ request.get(dotconf.metnet, function (r, data) {
         fs.writeFileSync(fileName, JSON.stringify(colData))
         fs.writeFileSync(smbFileName, JSON.stringify(colData))        
         saveDayFile(d)
+        var url = `${dotconf.vz.url}${dotconf.vz.temp}.json?operation=add&value=${d.air}`
+        request.post( {url},  function (error, response, body){ /* console.log( body ) */ })
+
     },
     (va) => { }
     )
