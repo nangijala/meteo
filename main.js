@@ -115,6 +115,16 @@ request.get(dotconf.metnet, function (r, data) {
         var url = `${dotconf.vz.url}${dotconf.vz.temp}.json?operation=add&value=${d.air}`
         request.post( {url},  function (error, response, body){ /* console.log( body ) */ })
 
+        var url = `${dotconf.vz.url}${dotconf.vz.druck}.json?operation=add&value=${d.airp2}`
+        request.post( {url},  function (error, response, body){ /* console.log( body ) */ })
+
+        var url = `${dotconf.vz.url}${dotconf.vz.winds}.json?operation=add&value=${d.winds}`
+        request.post( {url},  function (error, response, body){ /* console.log( body ) */ })
+
+        var url = `${dotconf.vz.url}${dotconf.vz.windm}.json?operation=add&value=${d.windm}`
+        request.post( {url},  function (error, response, body){  /* console.log( body ) */ })
+//	console.log(d)
+
     },
     (va) => { }
     )
