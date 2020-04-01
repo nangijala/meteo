@@ -123,6 +123,10 @@ request.get(dotconf.metnet, function (r, data) {
 
         var url = `${dotconf.vz.url}${dotconf.vz.windm}.json?operation=add&value=${d.windm}`
         request.post( {url},  function (error, response, body){  /* console.log( body ) */ })
+
+        var url = `${dotconf.vz.url}${dotconf.vz.sun}.json?operation=add&value=${d.sun}`
+        request.post( {url},  function (error, response, body){  /* console.log( body ) */ })
+
 //	console.log(d)
 
     },
